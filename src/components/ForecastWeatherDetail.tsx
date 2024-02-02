@@ -42,10 +42,10 @@ export default function ForecastWeatherDetail(
 
         {/*  */}
         <div className="flex flex-col px-4">
-          <span className="text-5xl">{convertKelvinToCelsius(temp ?? 0)}°</span>
+          <span className="text-3xl">{Math.floor(temp ?? 0)}°C</span>
           <p className="text-xs space-x-1 whitespace-nowrap">
-            <span> Feels like</span>
-            <span>{convertKelvinToCelsius(feels_like ?? 0)}°</span>
+            <span> Føles som</span>
+            <span>{Math.floor(feels_like ?? 0)}°C</span>
           </p>
           <p className="capitalize"> {description}</p>
         </div>

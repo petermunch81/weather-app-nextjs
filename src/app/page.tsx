@@ -12,6 +12,7 @@ import { getDayOrNightIcon } from "@/utils/getDayOrNightIcon";
 import { metersToKilometers } from "@/utils/metersToKilometers";
 import axios from "axios";
 import { format, fromUnixTime, parseISO } from "date-fns";
+import { da } from 'date-fns/esm/locale'
 import Image from "next/image";
 import { useQuery } from "react-query";
 import { loadingCityAtom, placeAtom } from "./atom";
@@ -81,7 +82,7 @@ export default function Home() {
     "repoData",
     async () => {
       const { data } = await axios.get(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=56`
+        `https://api.openweathermap.org/data/2.5/forecast?q=${place}&appid=${process.env.NEXT_PUBLIC_WEATHER_KEY}&cnt=56&lang=da&units=metric`
       );
       return data;
     }
@@ -139,7 +140,8 @@ export default function Home() {
             <section className="space-y-4 ">
               <div className="space-y-2">
                 <h2 className="flex gap-1 text-2xl  items-end ">
-                  <p>{format(parseISO(firstData?.dt_txt ?? ""), "EEEE")}</p>
+                  <p>{format(parseISO(firstData?.dt_txt ?? ""), "EEEE", {locale: da} )}</p> 
+                  {/* // { locale: 'da' } */}
                   <p className="text-lg">
                     ({format(parseISO(firstData?.dt_txt ?? ""), "dd.MM.yyyy")})
                   </p>
@@ -148,12 +150,12 @@ export default function Home() {
                   {/* temprature */}
                   <div className=" flex flex-col px-4 ">
                     <span className="text-5xl">
-                      {convertKelvinToCelsius(firstData?.main.temp ?? 296.37)}°
+                      {Math.floor(firstData?.main.temp ?? 296.37)}°
                     </span>
                     <p className="text-xs space-x-1 whitespace-nowrap">
-                      <span> Feels like</span>
+                      <span> Føles som</span>
                       <span>
-                        {convertKelvinToCelsius(
+                        {Math.floor(
                           firstData?.main.feels_like ?? 0
                         )}
                         °
@@ -161,12 +163,14 @@ export default function Home() {
                     </p>
                     <p className="text-xs space-x-2">
                       <span>
-                        {convertKelvinToCelsius(firstData?.main.temp_min ?? 0)}
+                        {/* {convertKelvinToCelsius(firstData?.main.temp_min ?? 0)} */}
+                        {Math.floor(firstData?.main.temp_min ?? 0)}
                         °↓{" "}
                       </span>
                       <span>
                         {" "}
-                        {convertKelvinToCelsius(firstData?.main.temp_max ?? 0)}
+                        {/* {convertKelvinToCelsius(firstData?.main.temp_max ?? 0)} */}
+                        {Math.floor(firstData?.main.temp_max ?? 0)}
                         °↑
                       </span>
                     </p>
@@ -179,17 +183,18 @@ export default function Home() {
                         className="flex flex-col justify-between gap-2 items-center text-xs font-semibold "
                       >
                         <p className="whitespace-nowrap">
-                          {format(parseISO(d.dt_txt), "h:mm a")}
+                          {format(parseISO(d.dt_txt), "H:mm")}
+                          {/* {d.dt_txt} */}
                         </p>
 
-                        {/* <WeatherIcon iconName={d.weather[0].icon} /> */}
                         <WeatherIcon
                           iconName={getDayOrNightIcon(
                             d.weather[0].icon,
                             d.dt_txt
                           )}
                         />
-                        <p>{convertKelvinToCelsius(d?.main.temp ?? 0)}°</p>
+                        {/* <p>{convertKelvinToCelsius(d?.main.temp ?? 0)} °C</p> */}
+                        <p>{ Math.floor(d?.main.temp ?? 0)} °C</p>
                       </div>
                     ))}
                   </div>
@@ -214,7 +219,7 @@ export default function Home() {
                       firstData?.visibility ?? 10000
                     )}
                     airPressure={`${firstData?.main.pressure} hPa`}
-                    humidity={`${firstData?.main.humidity}%`}
+                    humidity={`${firstData?.main.humidity} %`}
                     sunrise={format(
                       fromUnixTime(data?.city.sunrise ?? 1702949452),
                       "H:mm"
@@ -232,28 +237,20 @@ export default function Home() {
 
             {/* 7 day forcast data  */}
             <section className="flex w-full flex-col gap-4  ">
-              <p className="text-2xl">Forcast (7 days)</p>
+              <p className="text-2xl">Næste 7 dage</p>
               {firstDataForEachDate.map((d, i) => (
                 <ForecastWeatherDetail
                   key={i}
                   description={d?.weather[0].description ?? ""}
                   weatehrIcon={d?.weather[0].icon ?? "01d"}
                   date={format(parseISO(d?.dt_txt ?? ""), "dd.MM")}
-                  day={format(parseISO(d?.dt_txt ?? ""), "EEEE")}
+                  day={format(parseISO(d?.dt_txt ?? ""), "EEEE", {locale: da})}
                   feels_like={d?.main.feels_like ?? 0}
                   temp={d?.main.temp ?? 0}
                   temp_max={d?.main.temp_max ?? 0}
                   temp_min={d?.main.temp_min ?? 0}
                   airPressure={`${d?.main.pressure} hPa `}
-                  humidity={`${d?.main.humidity}% `}
-                  sunrise={format(
-                    fromUnixTime(data?.city.sunrise ?? 1702517657),
-                    "H:mm"
-                  )}
-                  sunset={format(
-                    fromUnixTime(data?.city.sunset ?? 1702517657),
-                    "H:mm"
-                  )}
+                  humidity={`${d?.main.humidity} % `}          
                   visability={`${metersToKilometers(d?.visibility ?? 10000)} `}
                   windSpeed={`${convertWindSpeed(d?.wind.speed ?? 1.64)} `}
                 />

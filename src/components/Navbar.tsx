@@ -96,7 +96,7 @@ export default function Navbar({ location }: Props) {
           {/*  */}
           <section className="flex gap-2 items-center">
             <MdMyLocation
-              title="Your Current Location"
+              title="Din nuværende placering"
               onClick={handleCurrentLocation}
               className="text-2xl  text-gray-400 hover:opacity-80 cursor-pointer"
             />
